@@ -13,12 +13,20 @@ obsidian://switch?vault=myvault&filename=Today.md
 A sample script `obsidian-rofi.py` is included. It can be used with [Rofi](https://github.com/davatorium/rofi) like the following examples:
 
 ```
+# Just switch Obsidian tabs
 rofi -modi "obsidian:./obsidian-rofi.py" -show obsidian
 
+# Show all desktop windows as well as Obsidian tabs in the same list of options
 rofi -modes combi -show combi -show-icons -combi-modes "window,obsidian:./obsidian-rofi.py"
 
+# Show desktop windows and tabs in different pages (switch with Ctrl+Tab)
 rofi -modes "window,obsidian" -show window -show-icons -modi "window,obsidian:./obsidian-rofi.py"
 ```
+
+This is what switching tabs can look like from a global shortcut in your desktop environment:
+
+![Screenshot](example.jpg)
+
 
 This has only been tested on linux.
 
