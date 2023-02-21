@@ -1,96 +1,117 @@
-# Obsidian Sample Plugin
+# Rofi Helper Plugin
 
-This is a sample plugin for Obsidian (https://obsidian.md).
+This plugin adds a leaf id parameter to the URI protocol for switching between open obsidian tabs with Rofi. A sample Rofi script is included.
 
-This project uses Typescript to provide type checking and documentation.
-The repo depends on the latest plugin API (obsidian.d.ts) in Typescript Definition format, which contains TSDoc comments describing what it does.
+The plugin adds URI params for id, and filename. They can be used like this:
 
-**Note:** The Obsidian API is still in early alpha and is subject to change at any time!
+```
+obsidian://switch?vault=myvault&id=43ee39f0a20b097a
 
-This sample plugin demonstrates some of the basic functionality the plugin API can do.
-- Changes the default font color to red using `styles.css`.
-- Adds a ribbon icon, which shows a Notice when clicked.
-- Adds a command "Open Sample Modal" which opens a Modal.
-- Adds a plugin setting tab to the settings page.
-- Registers a global click event and output 'click' to the console.
-- Registers a global interval which logs 'setInterval' to the console.
+obsidian://switch?vault=myvault&filename=Today.md
+```
 
-## First time developing plugins?
+A sample script `obsidian-rofi.py` is included. It can be used with [Rofi](https://github.com/davatorium/rofi) like the following examples:
 
-Quick starting guide for new plugin devs:
+```
+rofi -modi "obsidian:./obsidian-rofi.py" -show obsidian
 
-- Check if [someone already developed a plugin for what you want](https://obsidian.md/plugins)! There might be an existing plugin similar enough that you can partner up with.
-- Make a copy of this repo as a template with the "Use this template" button (login to GitHub if you don't see it).
-- Clone your repo to a local development folder. For convenience, you can place this folder in your `.obsidian/plugins/your-plugin-name` folder.
-- Install NodeJS, then run `npm i` in the command line under your repo folder.
-- Run `npm run dev` to compile your plugin from `main.ts` to `main.js`.
-- Make changes to `main.ts` (or create new `.ts` files). Those changes should be automatically compiled into `main.js`.
-- Reload Obsidian to load the new version of your plugin.
-- Enable plugin in settings window.
-- For updates to the Obsidian API run `npm update` in the command line under your repo folder.
+rofi -modes combi -show combi -show-icons -combi-modes "window,obsidian:./obsidian-rofi.py"
 
-## Releasing new releases
+rofi -modes "window,obsidian" -show window -show-icons -modi "window,obsidian:./obsidian-rofi.py"
+```
 
-- Update your `manifest.json` with your new version number, such as `1.0.1`, and the minimum Obsidian version required for your latest release.
-- Update your `versions.json` file with `"new-plugin-version": "minimum-obsidian-version"` so older versions of Obsidian can download an older version of your plugin that's compatible.
-- Create new GitHub release using your new version number as the "Tag version". Use the exact version number, don't include a prefix `v`. See here for an example: https://github.com/obsidianmd/obsidian-sample-plugin/releases
-- Upload the files `manifest.json`, `main.js`, `styles.css` as binary attachments. Note: The manifest.json file must be in two places, first the root path of your repository and also in the release.
-- Publish the release.
+This has only been tested on linux.
 
-> You can simplify the version bump process by running `npm version patch`, `npm version minor` or `npm version major` after updating `minAppVersion` manually in `manifest.json`.
-> The command will bump version in `manifest.json` and `package.json`, and add the entry for the new version to `versions.json`
 
-## Adding your plugin to the community plugin list
+# How it works
 
-- Check https://github.com/obsidianmd/obsidian-releases/blob/master/plugin-review.md
-- Publish an initial version.
-- Make sure you have a `README.md` file in the root of your repo.
-- Make a pull request at https://github.com/obsidianmd/obsidian-releases to add your plugin.
+The `workspace.json` file contains the the nested structure of all your open windows, tabs, and panes. Sometimes you may even have the same file open in multiple places. Luckily he "id" associated with each "leaf" is unique. 
 
-## How to use
-
-- Clone this repo.
-- `npm i` or `yarn` to install dependencies
-- `npm run dev` to start compilation in watch mode.
-
-## Manually installing the plugin
-
-- Copy over `main.js`, `styles.css`, `manifest.json` to your vault `VaultFolder/.obsidian/plugins/your-plugin-id/`.
-
-## Improve code quality with eslint (optional)
-- [ESLint](https://eslint.org/) is a tool that analyzes your code to quickly find problems. You can run ESLint against your plugin to find common bugs and ways to improve your code. 
-- To use eslint with this project, make sure to install eslint from terminal:
-  - `npm install -g eslint`
-- To use eslint to analyze this project use this command:
-  - `eslint main.ts`
-  - eslint will then create a report with suggestions for code improvement by file and line number.
-- If your source code is in a folder, such as `src`, you can use eslint with this command to analyze all files in that folder:
-  - `eslint .\src\`
-
-## Funding URL
-
-You can include funding URLs where people who use your plugin can financially support it.
-
-The simple way is to set the `fundingUrl` field to your link in your `manifest.json` file:
+Here's a snippet from a workspace.json:
 
 ```json
 {
-    "fundingUrl": "https://buymeacoffee.com"
-}
+  "main": {
+    "id": "72987848c4af5ae2",
+    "type": "split",
+    "children": [
+      {
+        "id": "58d9b585d8e1dcfc",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "43ee39f0a20b097a",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Today.md",
+                "mode": "source",
+                "source": false
+              }
+            }
+          },
 ```
 
-If you have multiple URLs, you can also do:
+We have "Today.md" in the first window, in the first tab, and it's unique leaf id is "43ee39f0a20b097a".
 
-```json
-{
-    "fundingUrl": {
-        "Buy Me a Coffee": "https://buymeacoffee.com",
-        "GitHub Sponsor": "https://github.com/sponsors",
-        "Patreon": "https://www.patreon.com/"
-    }
-}
+For a vault name of "myvault", you can switch to this tab with the URI command
+
+```
+obsidian://switch?vault=myvault&id=43ee39f0a20b097a
 ```
 
-## API Documentation
+The `obsidian-rofi.py` python script will generate options for Rofi to use, including ROFI_INFO data like `\0info\x1f43ee39f0a20b097a`.
 
-See https://github.com/obsidianmd/obsidian-api
+Example data fed to Rofi:
+
+```
+Today.md                          Window #1   Tab #1 \0info\x1f43ee39f0a20b097a
+BalanceQuoteStumble.md            Window #1   Tab #2 \0info\x1fabc2e775384ee4bd
+ServiceDoorShield.md              Window #1   Tab #3 \0info\x1fbbd04ae750429c70
+MadFemaleRequire.md               Window #1   Tab #4 \0info\x1f869f278435d06213
+NuclearBachelorDolphin.md         Window #1   Tab #5 \0info\x1ff7382c4f782e3a96
+PalmInquiryIll.md                 Window #1   Tab #1   (pane 1, 0)\0info\x1f4c5b77a0a0ef503a
+SwearPleaseUncle.md               Window #1   Tab #1   (pane 1, 1)\0info\x1f0680d3ef4924151a
+ChangeWishSilly.md                Window #2   Tab #1 \0info\x1f3bf95912f8aa5762
+SuperVerifyPage.md                Window #2   Tab #2 \0info\x1f40951226d95a2b09
+AugustNeckActress.md              Window #2   Tab #3 \0info\x1fa95182e08ffd83c9
+ArenaRobustMinute.md              Window #2   Tab #4 \0info\x1ffb29a9612dc4d373
+SorryVisaCrazy.md                 Window #3   Tab #1 \0info\x1f138011d0535c2b70
+JewelBulkScan.md                  Window #3   Tab #2 \0info\x1fa7785009f7d48a86
+DemiseMangoAvocado.md             Window #3   Tab #3 \0info\x1fc530b65373eef3cd
+RazorWomanSausage.md              Window #3   Tab #4 \0info\x1f8cdb3423a23a6ab3
+CrouchPuppySoap.md                Window #3   Tab #5 \0info\x1f6df01c33637a6fd1
+FindMandateBoil.md                Window #3   Tab #6 \0info\x1f3cd8d7818da52072
+TeachHeavyGuide.md                Window #3   Tab #7 \0info\x1fa6fbb165051c6499
+WidthIndustryPear.md              Window #4   Tab #1   (pane 0, 0)\0info\x1f1cacfcf428d48a55
+InnocentRadarSpirit.md            Window #4   Tab #2   (pane 0, 0)\0info\x1f1310c5bbe9bb7fa7
+HeightSilverLonely.md             Window #4   Tab #1   (pane 0, 1, 0)\0info\x1fb9d4aae2e3c381be
+StoryGrocerySearch.md             Window #4   Tab #1   (pane 0, 1, 1)\0info\x1f509c79695d5f1797
+SettleWrestleLesson.md            Window #4   Tab #2   (pane 0, 1, 1)\0info\x1fdf6b7d173f33c121
+FreshAlcoholPony.md               Window #5   Tab #1 \0info\x1f8c36518811afd173
+FlavorBananaStuff.md              Window #5   Tab #2 \0info\x1feeed956c4a5f91ee
+AthleteBenefitLava.md             Window #5   Tab #3 \0info\x1f881afaf6dd5cfb3a
+VehicleNaiveBrick.md              Window #5   Tab #4 \0info\x1f4024b398ca65ba6e
+CarbonBadgeForum.md               Window #5   Tab #5 \0info\x1f77bc0f588a5bc545
+SpawnStrategyUniform.md           Window #5   Tab #6 \0info\x1f184d72c238cb1805
+CattleEnactShield.md              Window #5   Tab #7 \0info\x1f1a2393cfed658c99
+TunaMaximumTortoise.md            Window #5   Tab #8 \0info\x1f334bbc2477d62b14
+ShopHalfLift.md                   Window #5   Tab #9 \0info\x1f39f068daabd2e8a5
+GrapeChickenCheap.md              Window #5   Tab #10\0info\x1f0d10e38373707ee8
+MenuRunPlastic.md                 Window #5   Tab #11\0info\x1fe1f8500ce1284f0d
+WarfareDilemmaPeace.md            Window #5   Tab #12\0info\x1f0566d123dd331424
+MerryTossDance.md                 Window #5   Tab #13\0info\x1f93a8b2da92c11ce8
+SimpleSymptomFemale.md            Window #5   Tab #14\0info\x1f39b9835ebf05122b
+ExplainFosterGain.md              Window #6   Tab #1 \0info\x1fdb67248d18558749
+DamageIsolateGuide.md             Window #6   Tab #2 \0info\x1f6783ec422ebe1fb5
+AffordRecycleInflict.md           Window #6   Tab #3 \0info\x1f89b4e6c22821b78d
+LatinSubjectWhere.md              Window #6   Tab #4 \0info\x1f629da7c82cf14852
+DadTimeMonth.md                   Window #7   Tab #1 \0info\x1fc844db65dc30aa0a
+SoldierDocumentRaw.md             Window #8   Tab #1 \0info\x1f79df1c897507be49
+AddressTrickPriority.md           Window #8   Tab #1 \0info\x1fa2e8678d3caef54e
+BrokenGunAlbum.md                 Window #8   Tab #2 \0info\x1f711a19246c26c83a
+```
+
+After making your selection, Rofi will exit and the URI command is called with xdg-open.
+
