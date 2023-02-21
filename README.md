@@ -25,7 +25,7 @@ This has only been tested on linux.
 
 # How it works
 
-The `workspace.json` file contains the the nested structure of all your open windows, tabs, and panes. Sometimes you may even have the same file open in multiple places. Luckily he "id" associated with each "leaf" is unique. 
+The `workspace.json` file contains the the nested structure of all your open windows, tabs, and panes. Sometimes you may even have the same file open in multiple places. Luckily the "id" associated with each "leaf" is unique. 
 
 Here's a snippet from a workspace.json:
 
