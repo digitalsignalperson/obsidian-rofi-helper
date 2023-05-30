@@ -1,4 +1,4 @@
-# Rofi Helper Plugin
+# Rofi Helper
 
 This plugin adds a leaf id parameter to the URI protocol for switching between open obsidian tabs with Rofi. A sample Rofi script is included.
 
