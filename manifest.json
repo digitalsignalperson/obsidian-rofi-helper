@@ -1,6 +1,6 @@
 {
 	"id": "rofi-helper",
-	"name": "Rofi Helper Plugin",
+	"name": "Rofi Helper",
 	"version": "1.0.0",
 	"minAppVersion": "1.1.9",
 	"description": "This plugin adds a leaf id parameter to the URI protocol for switching between open obsidian tabs with Rofi. A sample Rofi script is included.",
