@@ -123,3 +123,26 @@ BrokenGunAlbum.md                 Window #8   Tab #2 \0info\x1f711a19246c26c83a
 
 After making your selection, Rofi will exit and the URI command is called with xdg-open.
 
+# Getting the script working with rofi
+
+In the included sample script `obsidian-rofi.py` set these two variables with your personal settings:
+```
+vault_name = 'my-vault'
+vault_path = '/home/my-name/my-files/my-vault'
+```
+
+If you run this script locally `python obsidian-rofi.py` it should print a list like shown in the previous section like
+```
+Today.md                          Window #1   Tab #1 \0info\x1f43ee39f0a20b097a
+BalanceQuoteStumble.md            Window #1   Tab #2 \0info\x1fabc2e775384ee4bd
+ServiceDoorShield.md              Window #1   Tab #3 \0info\x1fbbd04ae750429c70
+MadFemaleRequire.md               Window #1   Tab #4 \0info\x1f869f278435d06213
+NuclearBachelorDolphin.md         Window #1   Tab #5 \0info\x1ff7382c4f782e3a96
+...
+```
+
+Next you should `chmod +x obsidian-rofi.py` since it will be called by rofi like a script.
+
+Confirm you get the same output from the program by running `./obsidian-rofi.py`. You might need to adjust the `#!/bin/python` shebang.
+
+Finally some different examples of rofi commands are provided in the previous sections. Ensure the python script is located in a folder in your path (check `echo $PATH`) for them to work.
