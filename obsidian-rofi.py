@@ -5,7 +5,8 @@ import sys
 import os
 import urllib
 import subprocess
-
+import urllib.parse
+import re
 # Usage examples:
 #   rofi -modi "obsidian:./obsidian-rofi.py" -show obsidian
 #   rofi -modes combi -show combi -show-icons -combi-modes "window,obsidian:./obsidian-rofi.py"
@@ -13,7 +14,7 @@ import subprocess
 
 # Set these two variables with your personal settings
 vault_name = 'my-vault'
-vault_path = '/home/my-name/my-files/my-vault'
+vault_path = 'address to my-vault'
 
 
 if 'ROFI_INFO' in os.environ:
@@ -31,7 +32,7 @@ def leaf_indexes(data, indexes=None, depth=0):
         raise RecursionError
     if isinstance(data, dict):
         if data.get('type') == 'leaf':
-            if data['state']['type'] in ['markdown', 'canvas', 'image', 'video', 'pdf']:
+            if data['state']['type'] in ['markdown', 'canvas', 'image', 'video', 'pdf','excalidraw','pdf-annotator']:
                 if indexes[0] == 'main':
                     window_number = 0
                 else:
@@ -65,18 +66,13 @@ for index, mid, mfile in leaf_indexes(data):
         index = index[3:]
 
     panes = index[1::2]
-    
-    n = 60
-    mfile_str = mfile if len(mfile) < n else mfile[:n-3] + '...'
+    mfile_str=re.search("([^\/]+)(?=\.\w+$)",mfile).group()
     window_str = '#' + str(window + 1)
     tab_str = '#' + str(tab + 1)
-    name = f'{mfile_str:{n}}'
-    name += '    '
-    name += f'Window {window_str:3}  Tab {tab_str:3}'
-
+    name = mfile_str
     if len(panes) > 1:
         x = ', '.join(map(str, panes))
-        name += f'  (pane {x})'
+        #name += f'  (pane {x})'
 
     # print(name)
     out = name + '\0info\x1f' + str(mid)
