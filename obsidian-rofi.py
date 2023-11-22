@@ -69,7 +69,7 @@ for index, mid, mfile in leaf_indexes(data):
     mfile_str=re.search("([^\/]+)(?=\.\w+$)",mfile).group()
     window_str = '#' + str(window + 1)
     tab_str = '#' + str(tab + 1)
-    name = f'{mfile_str:{n}}'
+    name = mfile_str
     if len(panes) > 1:
         x = ', '.join(map(str, panes))
         #name += f'  (pane {x})'
